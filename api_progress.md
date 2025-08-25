@@ -13,6 +13,9 @@ This document tracks the goals, progress, and challenges during the development 
 - **Completed:** Implemented a user management endpoint (`/api/users`) to list all users.
 - **Completed:** Protected the user management endpoint using role-based access control (`Admin` & `Super Admin` only).
 - **Completed:** Implemented full CRUD (Show, Update, Delete) functionality for the user management endpoints.
+- **Completed:** Implement API endpoints for full CRUD management of Roles.
+- **Completed:** Implement an API endpoint to list all available Permissions.
+- **Completed:** Secure all Role and Permission management endpoints to be accessible only by the "Super Admin" role.
 
 ## Handoff Notes for Frontend Integration
 
