@@ -39,9 +39,7 @@
     },
     "scripts": {
         "post-autoload-dump": [
-            "@php artisan config:clear",
-            "@php artisan clear-compiled",
-            "@php artisan package:discover --ansi"
+            "@php -r \"if (file_exists('artisan')) { echo 'Laravel detected, skipping config clear'; }\""
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
@@ -53,11 +51,6 @@
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
-        ],
-        "post-install-cmd": [
-            "@php artisan key:generate --ansi",
-            "@php artisan migrate --force --ansi",
-            "@php artisan storage:link --ansi"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
