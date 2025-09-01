@@ -26,13 +26,37 @@ fi
 
 log "APP_KEY is configured"
 
-# Wait for database to be ready (if using PostgreSQL)
+# Wait for database to be ready and run migrations
 if [ ! -z "$DATABASE_URL" ] || [ ! -z "$DB_HOST" ]; then
-    log "Database configuration detected, running migrations..."
-    php artisan migrate --force
-    log "Migrations completed"
+    log "Database configuration detected..."
+    
+    # Wait for database connection
+    log "Waiting for database connection..."
+    for i in {1..30}; do
+        if php artisan tinker --execute="echo 'DB connected';" 2>/dev/null; then
+            log "Database connection successful"
+            break
+        fi
+        log "Attempt $i: Database not ready, waiting..."
+        sleep 2
+    done
+    
+    # Run migrations
+    log "Running database migrations..."
+    php artisan migrate --force || {
+        log "ERROR: Migrations failed"
+        exit 1
+    }
+    log "Migrations completed successfully"
+    
+    # Run seeders
+    log "Running database seeders..."
+    php artisan db:seed --force || {
+        log "WARNING: Seeders failed, continuing anyway"
+    }
+    log "Seeders completed"
 else
-    log "No database configuration found, skipping migrations"
+    log "No database configuration found, skipping database operations"
 fi
 
 # Clear caches
