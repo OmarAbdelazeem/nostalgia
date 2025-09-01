@@ -10,12 +10,13 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 
-// Health check route for deployment platforms
+// Simple health check route for deployment platforms (no database required)
 Route::get('/health', function () {
     return response()->json([
         'status' => 'healthy', 
         'timestamp' => now(),
-        'version' => '1.0.0'
+        'version' => '1.0.0',
+        'message' => 'Laravel API is running'
     ]);
 });
 

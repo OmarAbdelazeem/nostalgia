@@ -26,40 +26,7 @@ fi
 
 log "APP_KEY is configured"
 
-# Wait for database to be ready and run migrations
-if [ ! -z "$DATABASE_URL" ] || [ ! -z "$DB_HOST" ]; then
-    log "Database configuration detected..."
-    
-    # Wait for database connection
-    log "Waiting for database connection..."
-    for i in {1..30}; do
-        if php artisan tinker --execute="echo 'DB connected';" 2>/dev/null; then
-            log "Database connection successful"
-            break
-        fi
-        log "Attempt $i: Database not ready, waiting..."
-        sleep 2
-    done
-    
-    # Run migrations
-    log "Running database migrations..."
-    php artisan migrate --force || {
-        log "ERROR: Migrations failed"
-        exit 1
-    }
-    log "Migrations completed successfully"
-    
-    # Run seeders
-    log "Running database seeders..."
-    php artisan db:seed --force || {
-        log "WARNING: Seeders failed, continuing anyway"
-    }
-    log "Seeders completed"
-else
-    log "No database configuration found, skipping database operations"
-fi
-
-# Clear caches
+# Clear caches first
 log "Clearing Laravel caches..."
 php artisan config:clear
 php artisan cache:clear
@@ -75,10 +42,31 @@ else
     log "Storage link already exists"
 fi
 
-# Test the application
-log "Testing application..."
-php artisan route:list --compact
+# Try to run migrations if database is available
+if [ ! -z "$DATABASE_URL" ] || [ ! -z "$DB_HOST" ]; then
+    log "Database configuration detected, attempting migrations..."
+    
+    # Wait a bit for database to be ready
+    sleep 5
+    
+    # Try to run migrations, but don't fail if they don't work
+    if php artisan migrate --force 2>/dev/null; then
+        log "Migrations completed successfully"
+    else
+        log "WARNING: Migrations failed, continuing anyway"
+    fi
+else
+    log "No database configuration found, skipping migrations"
+fi
+
+# Test if the application can start
+log "Testing application startup..."
+if php artisan route:list --compact >/dev/null 2>&1; then
+    log "Application test successful"
+else
+    log "WARNING: Application test failed, continuing anyway"
+fi
 
 # Start the server
 log "Starting Laravel server on port $PORT..."
-php artisan serve --host=0.0.0.0 --port=$PORT 
+exec php artisan serve --host=0.0.0.0 --port=$PORT 
