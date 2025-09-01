@@ -34,8 +34,8 @@ RUN composer install --ignore-platform-reqs --no-dev --optimize-autoloader
 # Make startup script executable
 RUN chmod +x start.sh
 
-# Expose port 8000
-EXPOSE 8000
+# Expose dynamic port (Railway will set $PORT)
+EXPOSE $PORT
 
 # Start the application
 CMD ["./start.sh"] 
