@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: laravel-nostalgia-api
+    env: php
+    plan: free
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: stack
+      - key: CACHE_DRIVER
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+    healthCheckPath: /api/health
+
+databases:
+  - name: laravel-nostalgia-db
+    databaseName: laravel_nostalgia
+    user: laravel_user
+    plan: free 

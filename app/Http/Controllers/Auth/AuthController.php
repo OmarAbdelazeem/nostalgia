@@ -24,7 +24,7 @@ class AuthController extends Controller
      *      operationId="registerUser",
      *      tags={"Authentication"},
      *      summary="Register a new user",
-     *      description="Returns user data and a token",
+     *      description="Register a new user with Admin role. Returns user data and a token",
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
@@ -37,7 +37,7 @@ class AuthController extends Controller
      *      ),
      *      @OA\Response(
      *          response=200,
-     *          description="Successful operation",
+     *          description="Successful operation - User registered with Admin role",
      *          @OA\JsonContent(
      *              @OA\Property(property="access_token", type="string"),
      *              @OA\Property(property="token_type", type="string", example="Bearer"),
@@ -45,7 +45,10 @@ class AuthController extends Controller
      *                  @OA\Property(property="id", type="integer"),
      *                  @OA\Property(property="name", type="string"),
      *                  @OA\Property(property="email", type="string"),
-     *                  @OA\Property(property="roles", type="array", @OA\Items(type="object")),
+     *                  @OA\Property(property="roles", type="array", @OA\Items(type="object",
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string", example="Admin")
+     *                  )),
      *                  @OA\Property(property="permissions", type="array", @OA\Items(type="string"))
      *              )
      *          )
@@ -70,8 +73,9 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $userRole = Role::findByName('User');
-        $user->assignRole($userRole);
+        // Assign Admin role to new registrations
+        $adminRole = Role::findByName('Admin');
+        $user->assignRole($adminRole);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

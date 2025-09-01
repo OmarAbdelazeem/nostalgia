@@ -15,6 +15,65 @@ class UserController extends Controller
 {
     /**
      * @OA\Get(
+     *      path="/api/user",
+     *      operationId="getCurrentUser",
+     *      tags={"User Management"},
+     *      summary="Get current authenticated user",
+     *      description="Returns the current authenticated user's information",
+     *      security={{"sanctum":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="id", type="integer", example=1),
+     *              @OA\Property(property="name", type="string", example="John Doe"),
+     *              @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *              @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *              @OA\Property(property="created_at", type="string", format="date-time"),
+     *              @OA\Property(property="updated_at", type="string", format="date-time"),
+     *              @OA\Property(property="roles", type="array", 
+     *                  @OA\Items(
+     *                      @OA\Property(property="id", type="integer", example=1),
+     *                      @OA\Property(property="name", type="string", example="Admin"),
+     *                      @OA\Property(property="guard_name", type="string", example="web")
+     *                  )
+     *              ),
+     *              @OA\Property(property="permissions", type="array", 
+     *                  @OA\Items(type="string", example="create products")
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      )
+     * )
+     */
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        $user->load('roles');
+        
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+            'roles' => $user->roles->map(function ($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'guard_name' => $role->guard_name,
+                ];
+            }),
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
      *      path="/api/users",
      *      operationId="getUsersList",
      *      tags={"User Management"},
@@ -24,7 +83,24 @@ class UserController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
-     *          @OA\JsonContent(type="array", @OA\Items(type="object"))
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items(
+     *                  @OA\Property(property="id", type="integer", example=1),
+     *              @OA\Property(property="name", type="string", example="John Doe"),
+     *              @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *              @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *              @OA\Property(property="created_at", type="string", format="date-time"),
+     *              @OA\Property(property="updated_at", type="string", format="date-time"),
+     *              @OA\Property(property="roles", type="array", 
+     *                  @OA\Items(
+     *                      @OA\Property(property="id", type="integer", example=1),
+     *                      @OA\Property(property="name", type="string", example="Admin"),
+     *                      @OA\Property(property="guard_name", type="string", example="web")
+     *                  )
+     *              )
+     *              )
+     *          )
      *       ),
      *      @OA\Response(
      *          response=401,

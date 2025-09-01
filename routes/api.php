@@ -3,25 +3,48 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 
+// Health check route for deployment platforms
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'healthy', 
+        'timestamp' => now(),
+        'version' => '1.0.0'
+    ]);
+});
+
+// Authentication routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+// Protected routes
+Route::middleware('api.auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [UserController::class, 'profile']);
 
-    Route::middleware(['role:Admin|Super Admin'])->group(function () {
-        Route::apiResource('users', UserController::class)->except(['store']);
-    });
+    // Categories routes
+    Route::apiResource('categories', CategoryController::class);
+    Route::post('/categories/{id}/update', [CategoryController::class, 'updateWithFormData']);
 
-    Route::middleware(['role:Super Admin'])->group(function () {
-        Route::apiResource('roles', RoleController::class);
-        Route::get('permissions', [PermissionController::class, 'index']);
-    });
+    // Products routes
+    Route::apiResource('products', ProductController::class);
+    
+    // Separate image upload endpoint
+    Route::post('/products/{product}/upload-image', [ProductController::class, 'uploadImage']);
+
+    // Product image management routes
+    Route::apiResource('products.images', ProductImageController::class);
+
+    // User management routes
+    Route::apiResource('users', UserController::class);
+
+    // Roles and permissions routes
+    Route::get('/roles', [RoleController::class, 'index']);
+    Route::get('/permissions', [PermissionController::class, 'index']);
 }); 
