@@ -2,6 +2,17 @@
 
 This guide will walk you through the steps to clone and run this project locally.
 
+## Prerequisites
+
+Before you begin, ensure you have the following software installed on your machine:
+
+- **PHP** (version `^8.2` or higher) - [Installation Guide](https://www.php.net/manual/en/install.php)
+- **Composer** (PHP dependency manager) - [Installation Guide](https://getcomposer.org/doc/00-intro.md)
+- **Node.js** and **npm** - [Installation Guide](https://nodejs.org/en/download/)
+- A local database server (the project is configured to use SQLite by default, which is a file-based database and requires no separate server).
+
+If you don't have a PHP development environment set up, you can use tools like [Laravel Herd](https://herd.laravel.com/) or [Laravel Sail](https://laravel.com/docs/sail) (which uses Docker) to get started quickly.
+
 ## 1. Clone the Repository
 
 First, clone the project from the repository to your local machine:
