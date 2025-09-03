@@ -31,6 +31,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libicu-dev \
     libsqlite3-dev \
+    libonig-dev \
     && docker-php-ext-install -j$(nproc) \
     pdo_sqlite \
     pdo_mysql \
