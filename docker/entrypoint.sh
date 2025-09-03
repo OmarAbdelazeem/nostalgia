@@ -11,7 +11,10 @@ echo "Starting SSH service..."
 echo "Running Laravel optimizations..."
 php artisan config:cache
 php artisan route:cache
-php artisan view:cache
+
+# Run database migrations
+echo "Running database migrations..."
+php artisan migrate --force
 
 echo "Starting Apache..."
 # Execute the original command (apache2-foreground)
