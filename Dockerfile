@@ -27,6 +27,7 @@ RUN echo "ServerName nostalgia-api" >> /etc/apache2/apache2.conf
 # - libzip-dev, unzip: for zip extension
 # - libicu-dev: for intl extension
 RUN apt-get update && apt-get install -y \
+    openssh-server \
     libzip-dev \
     unzip \
     libicu-dev \
@@ -41,6 +42,15 @@ RUN apt-get update && apt-get install -y \
     intl \
     opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Configure SSH
+RUN mkdir -p /var/run/sshd \
+    && echo "root:Docker!" | chpasswd \
+    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# SSH port
+EXPOSE 2222
 
 # Copy custom opcache configuration
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini

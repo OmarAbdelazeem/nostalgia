@@ -3,6 +3,10 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# Start the SSH service
+echo "Starting SSH service..."
+/usr/sbin/sshd
+
 # Run Laravel optimizations
 echo "Running Laravel optimizations..."
 php artisan config:cache
