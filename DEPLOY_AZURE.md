@@ -39,7 +39,8 @@ These steps assume you have already created a Resource Group, App Service Plan, 
     -   **Repository:** `omarabdelazeem/nostalgia`
     -   **Tag:** `latest`
     -   **Private repository:** Off (since it's a public repo)
-4.  Click **Save**. Azure will pull the latest image and restart your app.
+4.  **Important:** Leave the **Startup command** field **empty**. The startup logic is handled by the `ENTRYPOINT` script in the `Dockerfile`.
+5.  Click **Save**. Azure will pull the latest image and restart your app.
 
 ## 3. Configure Application Settings
 
