@@ -1,25 +1,27 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euxo pipefail
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
-
-# Start the SSH service
-echo "Starting SSH service..."
-# Generate host keys if they don't exist
+# Ensure SSH host keys exist (idempotent)
+echo "Generating SSH host keys..."
 ssh-keygen -A
-# Start SSH daemon in background
-/usr/sbin/sshd -D &
-echo "SSH service started on port 2222"
 
-# Run Laravel optimizations
+# Start sshd with logs to stderr; listen on 2222
+echo "Starting SSH daemon on port 2222..."
+/usr/sbin/sshd -D -e -p 2222 &
+
+# Small wait, then print diagnostics (will appear in Container Logs)
+sleep 2
+echo "=== SSH Diagnostics ==="
+( command -v ss >/dev/null && ss -lntp || netstat -tlnp ) || true
+pgrep -fal sshd || true
+echo "=== End SSH Diagnostics ==="
+
+# Run Laravel optimizations (don't fail startup if they fail)
 echo "Running Laravel optimizations..."
-php artisan config:cache
-php artisan route:cache
-
-# Run database migrations
-echo "Running database migrations..."
-php artisan migrate --force
+php artisan config:cache || true
+php artisan route:cache || true
+php artisan migrate --force || true
 
 echo "Starting Apache..."
-# Execute the original command (apache2-foreground)
+# Hand off to Apache (or whatever "$@" is)
 exec "$@"
