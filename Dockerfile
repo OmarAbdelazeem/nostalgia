@@ -43,11 +43,18 @@ RUN apt-get update && apt-get install -y \
     opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Configure SSH
+# Configure SSH for Azure App Service
 RUN mkdir -p /var/run/sshd \
     && echo "root:Docker!" | chpasswd \
     && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
-    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config \
+    && sed -i 's/Port 22/Port 2222/' /etc/ssh/sshd_config \
+    && echo "Port 2222" >> /etc/ssh/sshd_config \
+    && echo "ListenAddress 0.0.0.0" >> /etc/ssh/sshd_config \
+    && echo "UsePAM no" >> /etc/ssh/sshd_config \
+    && echo "X11Forwarding yes" >> /etc/ssh/sshd_config \
+    && echo "PrintMotd no" >> /etc/ssh/sshd_config
 
 # SSH port
 EXPOSE 2222

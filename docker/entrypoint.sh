@@ -5,7 +5,11 @@ set -e
 
 # Start the SSH service
 echo "Starting SSH service..."
-/usr/sbin/sshd
+# Generate host keys if they don't exist
+ssh-keygen -A
+# Start SSH daemon in background
+/usr/sbin/sshd -D &
+echo "SSH service started on port 2222"
 
 # Run Laravel optimizations
 echo "Running Laravel optimizations..."
